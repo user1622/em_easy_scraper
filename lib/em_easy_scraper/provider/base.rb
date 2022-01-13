@@ -14,10 +14,11 @@ module EmEasyScraper
 
       attr_accessor :worker_number, :crawler_number, :data, :scheduled_tasks
 
-      def initialize(worker_number)
+      def initialize(options, worker_number)
         @worker_number = worker_number
         @scheduled_tasks = []
         @data = {}
+        @options = options
         succeed if self.class.to_s == 'EmEasyScraper::Provider::Base'
       end
 

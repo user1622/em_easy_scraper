@@ -12,6 +12,7 @@ require 'http-cookie'
 
 require_relative 'em_easy_scraper/core_ext/http_connection'
 require_relative 'em_easy_scraper/core_ext/connect'
+require_relative 'em_easy_scraper/core_ext/hiredis'
 
 # Simple Scraper based on EventMachine
 module EmEasyScraper

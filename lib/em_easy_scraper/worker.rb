@@ -27,6 +27,10 @@ module EmEasyScraper
       @connection.send(:respond_to_missing?, name, include_private)
     end
 
+    def rate_limit_key(task)
+      provider.rate_limit_key(task)
+    end
+
     private
 
     def create_accessors(connection)

@@ -19,9 +19,18 @@ Metrics/PerceivedComplexity:
 Style/Documentation:
   Enabled: false
 
+Security/YAMLLoad:
+  Enabled: false
+
 Metrics/BlockLength:
   Exclude:
     - 'Rakefile'
     - '*.gemspec'
     - '**/*.rake'
     - 'spec/**/*.rb'
+
+AllCops:
+  Exclude:
+    - 'lib/em_easy_scraper/core_ext/*'
+    - 'tmp/*'
+

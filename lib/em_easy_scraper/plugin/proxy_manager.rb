@@ -51,10 +51,6 @@ module EmEasyScraper
         def read_proxies
           raise NotImplementedError
         end
-
-        def rate_limit_key(_)
-          [super, data[:proxy]].join(':')
-        end
       end
 
       def initialize(*_args)
@@ -74,6 +70,10 @@ module EmEasyScraper
         class << base
           prepend ClassMethods
         end
+      end
+
+      def rate_limit_key(_)
+        [super, data[:proxy]].join(':')
       end
 
       def worker_options(crawler_options, worker_number)

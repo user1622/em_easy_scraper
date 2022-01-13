@@ -30,9 +30,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency('em-files')
   spec.add_dependency('em-hiredis')
   spec.add_dependency('em-http-request')
-  spec.add_dependency('promise_em')
   spec.add_dependency('eventmachine')
   spec.add_dependency('http-cookie')
+  spec.add_dependency('promise_em')
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.0'

@@ -3,7 +3,8 @@
 module EmEasyScraper
   # rubocop:disable Metrics/ClassLength
   class Scraper
-    def initialize
+    def initialize(opts = {})
+      @opts = opts
       EM.threadpool_size = Config.instance.threadpool_size
       Config.instance.provider_plugins.each do |plugin_class|
         provider_class.send(:prepend, Object.const_get("EmEasyScraper::Plugin::#{plugin_class.classify}"))
@@ -37,7 +38,7 @@ module EmEasyScraper
 
     def perform_login
       login_todo.subscribe do |worker|
-        login_pool.perform(nil, SecureRandom.uuid) { |_| login_worker(worker) }
+        login_pool.perform(nil) { |_| login_worker(worker) }
       end
     end
 
@@ -222,7 +223,7 @@ module EmEasyScraper
 
     def create_worker(worker_number, attempt: 0, login_delay: 0)
       promise = PromiseEm::Promise.new do |resolve, reject|
-        provider = provider_class.new(worker_number)
+        provider = provider_class.new(@opts, worker_number)
         provider.callback { resolve.call(provider) }.errback { |*error| reject.call(*error) }
       end
       promise.then { |provider| Worker.new(provider: provider, worker_number: worker_number) }
@@ -242,7 +243,7 @@ module EmEasyScraper
 
     def perform_todo
       todo.subscribe do |task|
-        @crawler_pool.perform(task, provider_class.rate_limit_key(task)) do |worker|
+        @crawler_pool.perform(task) do |worker|
           promise = PromiseEm::Promise.new { |resolve, _reject| resolve.call }
                                       .catch do |error|
             EmEasyScraper.logger.error("Error #{error.class}: #{error}")

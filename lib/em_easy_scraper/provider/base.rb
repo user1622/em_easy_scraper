@@ -14,18 +14,16 @@ module EmEasyScraper
 
       attr_accessor :worker_number, :crawler_number, :data, :scheduled_tasks
 
-      def initialize(options, worker_number)
+      def initialize(opts, worker_number)
         @worker_number = worker_number
         @scheduled_tasks = []
         @data = {}
-        @options = options
+        @opts = opts
         succeed if self.class.to_s == 'EmEasyScraper::Provider::Base'
       end
 
-      class << self
-        def rate_limit_key(task)
-          task.uri.host
-        end
+      def rate_limit_key(task)
+        task.uri.host
       end
 
       def worker_options(_worker_number)

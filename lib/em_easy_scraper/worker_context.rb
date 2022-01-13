@@ -54,9 +54,8 @@ module EmEasyScraper
     end
 
     def marshal_load(array)
-      HTTP::CookieJar::HashStore.class
       @stored_cookies, @ignore_cookie_regexp, = array
-      @stored_cookies = YAML.safe_load(@stored_cookies)
+      @stored_cookies = YAML.load(@stored_cookies)
       @ignore_cookie_regexp = @ignore_cookie_regexp.blank? ? nil : Regexp.new(ignore_cookie_regexp)
     end
 

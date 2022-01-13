@@ -84,7 +84,7 @@ module EmEasyScraper
     end
 
     def root
-      Pathname.new(Dir.pwd)
+      Pathname.new(File.expand_path('../', __FILE__))
     end
   end
 end

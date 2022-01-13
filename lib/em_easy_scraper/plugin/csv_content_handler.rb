@@ -36,15 +36,15 @@ module EmEasyScraper
       private
 
       def validate_results(_results)
-        raise NotImplementedError
+        raise NotImplementedError unless defined?(super)
       end
 
       def csv_headers
-        raise NotImplementedError
+        raise NotImplementedError unless defined?(super)
       end
 
       def result_file_path
-        raise NotImplementedError
+        raise NotImplementedError unless defined?(super)
       end
     end
   end

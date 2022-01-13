@@ -49,7 +49,7 @@ module EmEasyScraper
     module ProxyManager
       module ClassMethods
         def read_proxies
-          raise NotImplementedError
+          raise NotImplementedError unless defined?(super)
         end
       end
 

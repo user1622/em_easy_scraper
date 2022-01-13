@@ -8,6 +8,7 @@ PATH
       em-http-request
       eventmachine
       http-cookie
+      promise_em
 
 GEM
   remote: https://rubygems.org/

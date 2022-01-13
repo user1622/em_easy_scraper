@@ -74,7 +74,7 @@ module EmEasyScraper
       end
 
       def rate_limit_key(_)
-        [super, data[:proxy]].join(':')
+        [super, Digest::MD5.hexdigest(data[:proxy].to_s)].join(':')
       end
 
       def worker_options(worker_number)

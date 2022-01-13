@@ -8,9 +8,8 @@ module EmEasyScraper
         state = restore_state
         if state
           @state = state
-          options[:proxy] = @state.dig(:provider_data, :proxy).to_h if @state.dig(:provider_data, :proxy)
-          options[:tls] = { cipher_list: @state.dig(:provider_data, :cipher_list) } if @state.dig(:provider_data,
-                                                                                                  :cipher_list)
+          options[:proxy] = @state.dig(:data, :proxy).to_h if @state.dig(:data, :proxy)
+          options[:tls] = { cipher_list: @state.dig(:data, :cipher_list) } if @state.dig(:data, :cipher_list)
         end
         super.merge(options)
       end
@@ -18,7 +17,7 @@ module EmEasyScraper
       def after_worker_initialize(worker)
         if defined?(@state)
           worker.context = @state[:context]
-          @data = @state[:provider_data]
+          @data = @state[:data]
         end
         super
       end
@@ -55,7 +54,7 @@ module EmEasyScraper
         cache.write(
           workers_state_key(context_key),
           context: worker.context,
-          provider_data: data
+          data: data
         )
         ::EmEasyScraper.logger.info("State was saved for worker #{context_key}")
       end

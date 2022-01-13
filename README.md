@@ -4,7 +4,7 @@
 ![Activity](https://img.shields.io/github/commit-activity/m/user1622/em_easy_scraper)
 
 
-Easy scraper tool based on EventMachine library
+Easy scraper tool based on EventMachine library.
 
 ## Installation
 

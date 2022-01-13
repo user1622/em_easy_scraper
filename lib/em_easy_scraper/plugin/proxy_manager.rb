@@ -52,7 +52,7 @@ module EmEasyScraper
           raise NotImplementedError
         end
 
-        def rate_limit_key
+        def rate_limit_key(_)
           [super, data[:proxy]].join(':')
         end
       end

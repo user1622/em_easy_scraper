@@ -67,15 +67,15 @@ module EmEasyScraper
     end
 
     def production?
-      Object.const_defined?('Rails') ? Rails.production? : env == 'production'
+      Object.const_defined?('Rails') ? Rails.env.production? : env == 'production'
     end
 
     def development?
-      Object.const_defined?('Rails') ? Rails.development? : env == 'development'
+      Object.const_defined?('Rails') ? Rails.env.development? : env == 'development'
     end
 
     def test?
-      Object.const_defined?('Rails') ? Rails.test? : env == 'test'
+      Object.const_defined?('Rails') ? Rails.env.test? : env == 'test'
     end
 
     def logger

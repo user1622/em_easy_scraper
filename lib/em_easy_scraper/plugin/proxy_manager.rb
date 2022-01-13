@@ -77,7 +77,7 @@ module EmEasyScraper
         [super, data[:proxy]].join(':')
       end
 
-      def worker_options(crawler_options, worker_number)
+      def worker_options(worker_number)
         options = super
         if options.key?(:proxy)
           @proxy_manager.data.delete_if { |element| element[:element].to_h == options[:proxy] }

@@ -11,7 +11,7 @@ module EmEasyScraper
         query += client.req.query.map { |param| param.join('=') } if client.req.query.present?
         uri.query = query.uniq.join('&') if query.any?
         warn(client.conn.connopts.proxy.to_s) if client.conn.connopts.proxy.present?
-        warn(client.conn.connopts.tls) if client.conn.connopts.tls.present?
+        warn(client.conn.connopts.tls.to_s) if client.conn.connopts.tls.present?
         warn("#{client.req.method} #{client.req.path} HTTP/1.1")
         warn(client.req.headers.to_a.map { |header| header.join(': ') }.join("\n"))
         warn("\r\n")

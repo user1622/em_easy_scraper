@@ -50,6 +50,7 @@ module EmEasyScraper
       module ClassMethods
         def read_proxies
           raise NotImplementedError unless defined?(super)
+
           super
         end
       end

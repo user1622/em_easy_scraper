@@ -294,8 +294,8 @@ module EmEasyScraper
     end
 
     def provider_class
-      @provider_class ||= Object.const_get("EmEasyScraper::Provider::#{@opts[:provider] ||
-        Config.instance.provider.classify}")
+      @provider_class ||= Object.const_get("EmEasyScraper::Provider::#{(@opts[:provider] ||
+        Config.instance.provider).classify}")
     end
 
     def login_todo

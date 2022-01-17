@@ -23,7 +23,7 @@ module EmEasyScraper
       end
 
       def rate_limit_key(task)
-        task.uri.host
+        ['rate_limit', task.uri.host].join(':')
       end
 
       def worker_options(_worker_number)

@@ -6,7 +6,7 @@ module EmEasyScraper
     def initialize(opts = {})
       @opts = opts
       EM.threadpool_size = Config.instance.threadpool_size
-      Config.instance.provider_plugins.each do |plugin_class|
+      (@opts[:provider_plugins] || Config.instance.provider_plugins).each do |plugin_class|
         provider_class.send(:prepend, Object.const_get("EmEasyScraper::Plugin::#{plugin_class.classify}"))
       end
       EM.add_shutdown_hook { shutdown }
@@ -32,7 +32,7 @@ module EmEasyScraper
       return @login_pool if defined?(@login_pool)
 
       @login_pool = Pool.new(actions_per_period: 60)
-      Config.instance.login_workers.times { @login_pool.add(Object.new) }
+      (@opts[:login_workers] || Config.instance.login_workers).times { @login_pool.add(Object.new) }
       @login_pool
     end
 
@@ -216,7 +216,7 @@ module EmEasyScraper
         worker.error = nil
       end
       @crawler_pool.on_error(on_error)
-      Config.instance.workers.times do |worker_number|
+      (@opts[:workers] || Config.instance.workers).times do |worker_number|
         create_worker(worker_number)
       end
     end
@@ -294,7 +294,8 @@ module EmEasyScraper
     end
 
     def provider_class
-      @provider_class ||= Object.const_get("EmEasyScraper::Provider::#{Config.instance.provider.classify}")
+      @provider_class ||= Object.const_get("EmEasyScraper::Provider::#{@opts[:provider] ||
+        Config.instance.provider.classify}")
     end
 
     def login_todo

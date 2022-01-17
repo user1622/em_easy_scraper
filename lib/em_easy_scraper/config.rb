@@ -6,7 +6,6 @@ module EmEasyScraper
 
     DEFAULT_SETTINGS = {
       crawler_number: 1,
-      max_crawler_number: 1,
       workers: 1,
       login_workers: 1,
       login_pause_sleep: nil,

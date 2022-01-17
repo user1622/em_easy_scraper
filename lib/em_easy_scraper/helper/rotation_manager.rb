@@ -5,7 +5,7 @@ module EmEasyScraper
     class RotationManager
       include Singleton
 
-      REQUIRED_PARAMS = %i[cache data].freeze
+      REQUIRED_PARAMS = %i[cache namespace data].freeze
       attr_accessor :data
 
       @opts = nil

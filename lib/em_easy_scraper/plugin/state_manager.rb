@@ -61,6 +61,7 @@ module EmEasyScraper
 
       def workers_state_key(context_key)
         [
+          'state_manager',
           @worker_number,
           context_key
         ].compact.join(':')

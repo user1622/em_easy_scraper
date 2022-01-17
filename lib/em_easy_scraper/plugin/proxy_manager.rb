@@ -62,6 +62,7 @@ module EmEasyScraper
           proxy_data = self.class.read_proxies
           Helper::ProxyManager.opts = {
             cache: cache,
+            namespace: contex_key,
             data: proxy_data
           }
         end

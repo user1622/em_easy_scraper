@@ -6,7 +6,7 @@ module EmEasyScraper
       protected
 
       def cache_namespace
-        'proxy_manager'
+        ['proxy_manager', self.class.opts[:namespace]].join(':')
       end
     end
   end

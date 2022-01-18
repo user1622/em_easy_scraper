@@ -30,7 +30,7 @@ module EmEasyScraper
         end
         result = super
         if result.key?(:deferrable)
-          result[:deferrable].callback { |state| save_state(worker) if state_ok?(state) }
+          result[:deferrable].callback { save_state(worker) if state_ok?(result) }
         elsif state_ok?(result)
           save_state(worker)
         end

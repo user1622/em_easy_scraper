@@ -6,6 +6,7 @@ module EmEasyScraper
     def initialize(opts = {})
       @opts = opts
       @opts[:shared_context] = {}
+      @stat = {}
       EM.threadpool_size = Config.instance.threadpool_size
       (@opts[:provider_plugins] || Config.instance.provider_plugins).each do |plugin_class|
         provider_class.send(:prepend, Object.const_get("EmEasyScraper::Plugin::#{plugin_class.classify}"))
@@ -14,12 +15,19 @@ module EmEasyScraper
     end
 
     def scrape(tasks)
-      EM.run do
+      read, write = IO.pipe
+      pid = EM.fork_reactor do
+        read.close
         perform_login
         create_crawler_pool
         perform_todo
         schedule_tasks(Array.wrap(tasks))
+        EM.add_shutdown_hook { Marshal.dump(@stat, write) }
       end
+      write.close
+      result = read.read
+      Process.wait(pid)
+      Marshal.load(result)
     end
 
     private
@@ -137,7 +145,7 @@ module EmEasyScraper
 
     def process_http_client_error(defer, error, opts, action)
       error_message = "Deferrable error: #{error},"\
-" proxy: #{opts[:worker].provider.data[:proxy]}, worker: #{opts[:worker].provider.context_key}, action: #{action},"
+" worker: #{opts[:worker].provider.context_key}, action: #{action},"
       error_message += ", task: #{opts[:task].url}" if opts[:task]
       error_class = continue_work?(error, opts[:worker]) ? EmEasyScraper::ReDownloadError : EmEasyScraper::ProviderError
       crawler_error = error_class.new(error_message)
@@ -148,7 +156,7 @@ module EmEasyScraper
 
     def process_other_error(defer, error, opts, action)
       error_message = "Deferrable error: #{error},"\
-" proxy: #{opts[:worker].provider.data[:proxy]}, worker: #{opts[:worker].provider.context_key}, action: #{action}"
+" worker: #{opts[:worker].provider.context_key}, action: #{action}"
       error_message += ", task: #{opts[:task].url}" if opts[:task]
       error_message += "\n#{error.message}"
       crawler_error = ProviderError.new(error_message)
@@ -318,7 +326,13 @@ module EmEasyScraper
 
     def re_push_task(task)
       task.try_count += 1
-      push_task(task)
+      if task.try_count > Config.instance.max_task_try_count
+        @stat[:not_downloaded_tasks] ||= []
+        @stat[:not_downloaded_tasks] << task
+        EmEasyScraper.logger.warn("Can't download task #{task.url} after #{task.try_count} attempts. Skip")
+      else
+        push_task(task)
+      end
     end
   end
   # rubocop:enable Metrics/ClassLength

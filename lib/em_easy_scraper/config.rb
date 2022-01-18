@@ -10,6 +10,7 @@ module EmEasyScraper
       login_workers: 1,
       login_pause_sleep: nil,
       max_login_try_count: 3,
+      max_task_try_count: 3,
       threadpool_size: 1,
       http_verbose: EmEasyScraper.development?,
       provider: 'base',

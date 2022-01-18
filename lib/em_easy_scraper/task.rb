@@ -28,6 +28,7 @@ module EmEasyScraper
       @try_count = 0
       @follow_location = false
       @data = {}
+      @memory_cache = ActiveSupport::Cache::MemoryStore.new
       initialize_parameters(params)
     end
 
@@ -44,9 +45,7 @@ module EmEasyScraper
     end
 
     def uri
-      return @uri if defined?(@uri)
-
-      @uri = Addressable::URI.parse(@url) if url.present?
+      @memory_cache.fetch(checksum) { Addressable::URI.parse(@url) if url.present? }
     end
 
     def http_method

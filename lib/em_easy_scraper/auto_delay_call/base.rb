@@ -13,11 +13,11 @@ module EmEasyScraper
         @normal_delay = period.to_f / @actions_per_period
       end
 
-      def execute(key, work: nil, reject: nil, &block)
+      def execute(key, work: nil, reject: nil, on_error: nil, &block)
         PromiseEm::Promise.new { |resolve, _reject| resolve.call }
                           .then { calculate_delay(key) }
                           .then { |delay| delay.zero? ? (block || work).call : reject&.call(delay) }
-                          .catch { |*_error| reject&.call(0) }
+                          .catch { |error| on_error&.call(error) }
       end
 
       private
@@ -28,6 +28,10 @@ module EmEasyScraper
 
       def history_key(key)
         [CACHE_NAMESPACE, key, @actions_per_period, @period].map(&:to_s).join(':')
+      end
+
+      def state_ok?(state)
+        state[:status] == STATUS[:OK]
       end
     end
   end

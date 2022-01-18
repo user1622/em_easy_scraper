@@ -138,6 +138,10 @@ module EmEasyScraper
       def cache
         EmEasyScraper::Config.instance.cache
       end
+
+      def shared_context
+        @opts[:shared_context]
+      end
     end
     # rubocop:enable Metrics/ClassLength
   end

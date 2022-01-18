@@ -3,13 +3,15 @@
 module EmEasyScraper
   class Worker
     AUX_KEYS = %i[provider context started_at finished_at].freeze
-    attr_accessor :provider, :worker_number, :login_attempt, :context, :started_at, :finished_at, :connection
+    STATUS = { initialized: 0, successful: 1, failed: 1 }.freeze
+    attr_accessor :provider, :worker_number, :login_attempt, :context, :started_at, :finished_at, :connection, :status
 
-    def initialize(provider:, worker_number:)
+    def initialize(provider:, worker_number:, login_attempt: 0)
       @provider = provider
       @worker_number = worker_number
-      @login_attempt = 0
+      @login_attempt = login_attempt
       @context = WorkerContext.new
+      initialized!
       @provider = provider
       @connection = EM::HttpRequest.new('https://www.example.com', provider.worker_options(worker_number))
       @connection.use(Middleware::HeadersManager)
@@ -29,6 +31,16 @@ module EmEasyScraper
 
     def rate_limit_key(task)
       provider.rate_limit_key(task)
+    end
+
+    STATUS.each do |key, value|
+      define_method("#{key}!") do
+        @status = value
+      end
+
+      define_method("#{key}?") do
+        @status == value
+      end
     end
 
     private

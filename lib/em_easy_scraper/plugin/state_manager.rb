@@ -29,7 +29,11 @@ module EmEasyScraper
           return { status: Provider::Base::STATUS[:OK] }
         end
         result = super
-        result.key?(:deferrable) ? result[:deferrable].callback { save_state(worker) } : save_state(worker)
+        if result.key?(:deferrable)
+          result[:deferrable].callback { |state| save_state(worker) if state_ok?(state) }
+        elsif state_ok?(result)
+          save_state(worker)
+        end
         result
       end
 
@@ -40,7 +44,7 @@ module EmEasyScraper
       end
 
       def before_exit(worker)
-        save_state(worker)
+        save_state(worker) if worker.successful?
         super
       end
 

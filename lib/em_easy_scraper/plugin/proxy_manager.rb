@@ -13,7 +13,7 @@ module EmEasyScraper
     end
 
     def to_s
-      [@uri.to_s, @type].join('@@@')
+      [@uri.to_s, @type].reject(&:blank?).join('@@@')
     end
 
     def to_h
@@ -55,24 +55,16 @@ module EmEasyScraper
         end
       end
 
-      def initialize(*_args)
-        super
-        @proxy_ban_period ||= 5.minutes
-        unless Helper::ProxyManager.opts
-          proxy_data = self.class.read_proxies
-          Helper::ProxyManager.opts = {
-            cache: cache,
-            namespace: context_key,
-            data: proxy_data
-          }
-        end
-        @proxy_manager = Helper::ProxyManager.instance
-      end
-
       def self.prepended(base)
         class << base
           prepend ClassMethods
         end
+      end
+
+      def initialize(*)
+        super
+        @proxy_ban_period ||= 5.minutes
+        shared_context[:proxy_manager] ||= Helper::ProxyManager.new(self, self.class.read_proxies)
       end
 
       def rate_limit_key(_)
@@ -82,9 +74,9 @@ module EmEasyScraper
       def worker_options(worker_number)
         options = super
         if options.key?(:proxy)
-          @proxy_manager.data.delete_if { |element| element[:element].to_h == options[:proxy] }
+          proxy_manager.data.delete_if { |element| element[:element].to_h == options[:proxy] }
         else
-          data[:proxy] = @proxy_manager.pop
+          data[:proxy] = proxy_manager.pop
           options.merge!(proxy: data[:proxy].to_h)
           ::EmEasyScraper.logger.debug("New proxy: #{data[:proxy]} for worker #{context_key}")
         end
@@ -93,10 +85,20 @@ module EmEasyScraper
 
       def after_re_login_worker(worker, attempt:, login_delay:)
         if data[:proxy]
-          @proxy_manager.push(data[:proxy], ban_time: @proxy_ban_period)
+          proxy_manager.push(data[:proxy], ban_time: @proxy_ban_period)
           ::EmEasyScraper.logger.debug("Proxy #{data[:proxy]} was banned")
+          data[:proxy] = nil
         end
         super
+      end
+
+      def before_exit(worker)
+        proxy_manager.insert(data[:proxy]) if data[:proxy]
+        super
+      end
+
+      def proxy_manager
+        shared_context[:proxy_manager]
       end
     end
   end

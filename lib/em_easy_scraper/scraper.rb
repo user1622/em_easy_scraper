@@ -5,6 +5,7 @@ module EmEasyScraper
   class Scraper
     def initialize(opts = {})
       @opts = opts
+      @opts[:shared_context] = {}
       EM.threadpool_size = Config.instance.threadpool_size
       (@opts[:provider_plugins] || Config.instance.provider_plugins).each do |plugin_class|
         provider_class.send(:prepend, Object.const_get("EmEasyScraper::Plugin::#{plugin_class.classify}"))
@@ -51,12 +52,14 @@ module EmEasyScraper
         @crawler_pool.add(worker)
         worker.login_attempt = 0
         worker.on_connection_error = ->(error) { EmEasyScraper.logger.error("Connection error: #{error}") }
+        worker.successful!
         EmEasyScraper.logger.info("Login success for worker: #{worker.provider.context_key}")
       end.catch do |error|
         worker.login_attempt += 1
+        worker.failed!
 
-        EmEasyScraper.logger.error("Can't login worker #{worker.provider.context_key} with proxy"\
-" #{worker.provider.data[:proxy]}. One more attempt: #{worker.login_attempt + 1}")
+        EmEasyScraper.logger.error("Can't login worker #{worker.provider.context_key}."\
+" One more attempt: #{worker.login_attempt}")
         EmEasyScraper.logger.error(error) if error
         re_login_worker(worker, attempt: worker.login_attempt)
       end
@@ -70,12 +73,11 @@ module EmEasyScraper
         nil
       end
       @crawler_pool.remove(worker)
-      worker_number = worker.worker_number
       if attempt >= Config.instance.max_login_try_count
         raise(EmEasyScraper::LoginError, 'A lot of login attempts') unless Config.instance.login_pause_sleep
 
         EM::Timer.new(Config.instance.login_pause_sleep) do
-          create_worker(worker_number, attempt: 0, login_delay: login_delay)
+          create_worker(worker.worker_number, attempt: 0, login_delay: login_delay)
         end
       else
         create_worker(worker.worker_number, attempt: attempt, login_delay: login_delay)
@@ -233,7 +235,7 @@ module EmEasyScraper
         message = "Can't create worker, initialize error: #{error}. Try again #{attempt}"
         EmEasyScraper.logger.error(message)
         if attempt >= Config.instance.max_login_try_count
-          raise(EmEasyScraper::Error, "Can't create worker, initialize error: #{error}. Try again #{attempt}",
+          raise(EmEasyScraper::Error, "Can't create worker, initialize error: #{error}. Attempt #{attempt - 1}",
                 error.backtrace)
         end
 

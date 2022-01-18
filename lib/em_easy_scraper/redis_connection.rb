@@ -25,6 +25,7 @@ module EmEasyScraper
       @redis = EM::Hiredis.connect(Config.instance.redis_url)
       @redis.errback { |error| ::EmEasyScraper.logger.fatal(error) }
       @redis.configure_inactivity_check(5, 5)
+      EM.add_shutdown_hook { remove_instance_variable(:@redis) }
       @redis
     end
   end

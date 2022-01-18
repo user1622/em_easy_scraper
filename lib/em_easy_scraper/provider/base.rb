@@ -109,8 +109,6 @@ module EmEasyScraper
 
       def before_exit(_worker); end
 
-      protected
-
       def cache
         EmEasyScraper::Config.instance.cache
       end

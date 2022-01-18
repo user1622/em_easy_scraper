@@ -29,10 +29,6 @@ module EmEasyScraper
       def history_key(key)
         [CACHE_NAMESPACE, key, @actions_per_period, @period].map(&:to_s).join(':')
       end
-
-      def state_ok?(state)
-        state[:status] == STATUS[:OK]
-      end
     end
   end
 end

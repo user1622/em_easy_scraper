@@ -109,6 +109,20 @@ module EmEasyScraper
 
       def before_exit(_worker); end
 
+      protected
+
+      def cache
+        EmEasyScraper::Config.instance.cache
+      end
+
+      def shared_context
+        @opts[:shared_context]
+      end
+
+      def state_ok?(state)
+        state[:status] == STATUS[:OK]
+      end
+
       private
 
       # rubocop:disable Metrics/AbcSize
@@ -134,14 +148,6 @@ module EmEasyScraper
         worker.uri.query = nil
       end
       # rubocop:enable Metrics/AbcSize
-
-      def cache
-        EmEasyScraper::Config.instance.cache
-      end
-
-      def shared_context
-        @opts[:shared_context]
-      end
     end
     # rubocop:enable Metrics/ClassLength
   end

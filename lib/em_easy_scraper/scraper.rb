@@ -27,7 +27,7 @@ module EmEasyScraper
       write.close
       result = read.read
       Process.wait(pid)
-      Marshal.load(result)
+      Marshal.load(result) rescue {}
     end
 
     private

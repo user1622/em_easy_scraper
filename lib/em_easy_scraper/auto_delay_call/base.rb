@@ -3,7 +3,7 @@
 module EmEasyScraper
   module AutoDelayCall
     class Base
-      CACHE_NAMESPACE = 'auto_delay_call'
+      CACHE_NAMESPACE = 'ees:auto_delay_call'
 
       attr_reader :normal_delay
 

@@ -22,6 +22,12 @@ Style/Documentation:
 Security/YAMLLoad:
   Enabled: false
 
+Security/MarshalLoad:
+  Enabled: false
+
+Style/RescueModifier:
+  Enabled: false
+
 Metrics/BlockLength:
   Exclude:
     - 'Rakefile'

@@ -17,4 +17,3 @@ task :local_release do
   system("git tag v#{EmEasyScraper::VERSION}")
   system('git push --tags')
 end
-

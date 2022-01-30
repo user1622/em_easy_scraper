@@ -49,7 +49,11 @@ module EmEasyScraper
       protected
 
       def cache_namespace
-        ['ees', self.class.name.underscore, @provider.class.name.underscore].join(':')
+        [
+          'ees',
+          self.class.name.underscore.split('::').last,
+          @provider.class.name.underscore.split('::').last
+        ].join(':')
       end
 
       def cache

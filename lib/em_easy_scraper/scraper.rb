@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'English'
 module EmEasyScraper
   # rubocop:disable Metrics/ClassLength
   class Scraper
@@ -22,12 +23,17 @@ module EmEasyScraper
         create_crawler_pool
         perform_todo
         schedule_tasks(Array.wrap(tasks))
-        EM.add_shutdown_hook { Marshal.dump(@stat, write) }
+        EM.add_shutdown_hook { Marshal.dump($ERROR_INFO || @stat, write) }
+      rescue StandardError => e
+        Marshal.dump(e, write)
       end
       write.close
       result = read.read
-      Process.wait(pid)
-      Marshal.load(result) rescue {}
+      _, status = Process.wait2(pid)
+      data = Marshal.load(result) rescue {}
+      raise data if status.exitstatus.positive?
+
+      data
     end
 
     private

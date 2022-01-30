@@ -249,7 +249,7 @@ module EmEasyScraper
         message = "Can't create worker, initialize error: #{error}. Try again #{attempt}"
         EmEasyScraper.logger.error(message)
         if attempt >= Config.instance.max_login_try_count || [EmEasyScraper::HelperError].include?(error.class)
-          raise(EmEasyScraper::Error, "Can't create worker, initialize error: #{error}. Attempt #{attempt - 1}",
+          raise(EmEasyScraper::Error, "Can't create worker, initialize error: #{error}. Attempt #{attempt + 1}",
                 error.backtrace)
         end
 

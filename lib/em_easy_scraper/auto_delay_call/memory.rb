@@ -3,7 +3,7 @@
 module EmEasyScraper
   module AutoDelayCall
     class Memory < Base
-      def initialize(*_args)
+      def initialize(actions_per_period:, period: 1.second.to_f)
         super
         @actions = {}
       end

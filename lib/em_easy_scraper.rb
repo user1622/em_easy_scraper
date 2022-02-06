@@ -2,6 +2,7 @@
 
 require 'singleton'
 require 'json'
+require 'yaml'
 
 require 'eventmachine'
 require 'active_support/all'
